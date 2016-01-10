@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
-
+using System.Diagnostics;
 
 namespace ProjektISS
 {
@@ -23,9 +23,13 @@ namespace ProjektISS
         private List<DataPoint> dataST = new List<DataPoint>();
         private List<DataPoint> dataRESP = new List<DataPoint>();
 
-        private int seconds=0;
+        private Timer timerLong = new Timer();
+        private Stopwatch stopwatch = new Stopwatch();
+        private bool recording = false;
+        private double timeStartRecording = 0;
+        private int iteration = 0;
+        private bool stopped = false;
 
-        private bool timerStarted = false;
         public Form1()
         {
             this.InitializeComponent();
@@ -48,10 +52,6 @@ namespace ProjektISS
         // Build the Chart
         private void CreateGraphHR(ZedGraphControl zgc)
         {
-            var document = XDocument.Load("HR.xml");
-            double[] Xarray = document.Descendants("X").Select(g => Math.Round((double)g,3)).ToArray();
-            double[] Yarray = document.Descendants("Y").Select(g => (double)g).ToArray();
-
             // get a reference to the GraphPane
             GraphPane myPane = zgc.GraphPane;
 
@@ -71,10 +71,6 @@ namespace ProjektISS
         }
         private void CreateGraphBR(ZedGraphControl zgc)
         {
-            var document = XDocument.Load("BR.xml");
-            double[] Xarray = document.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
-            double[] Yarray = document.Descendants("Y").Select(g => (double)g).ToArray();
-
             // get a reference to the GraphPane
             GraphPane myPane = zgc.GraphPane;
 
@@ -94,10 +90,6 @@ namespace ProjektISS
         }
         private void CreateGraphEKG(ZedGraphControl zgc)
         {
-            var document = XDocument.Load("ECG.xml");
-            double[] Xarray = document.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
-            double[] Yarray = document.Descendants("Y").Select(g => (double)g).ToArray();
-
             // get a reference to the GraphPane
             GraphPane myPane = zgc.GraphPane;
 
@@ -117,10 +109,6 @@ namespace ProjektISS
         }
         private void CreateGraphEMG(ZedGraphControl zgc)
         {
-            var document = XDocument.Load("EMG.xml");
-            double[] Xarray = document.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
-            double[] Yarray = document.Descendants("Y").Select(g => (double)g).ToArray();
-
             // get a reference to the GraphPane
             GraphPane myPane = zgc.GraphPane;
 
@@ -140,10 +128,6 @@ namespace ProjektISS
         }
         private void CreateGraphGSR(ZedGraphControl zgc)
         {
-            var document = XDocument.Load("GSR.xml");
-            double[] Xarray = document.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
-            double[] Yarray = document.Descendants("Y").Select(g => (double)g).ToArray();
-
             // get a reference to the GraphPane
             GraphPane myPane = zgc.GraphPane;
 
@@ -163,10 +147,6 @@ namespace ProjektISS
         }
         private void CreateGraphRESP(ZedGraphControl zgc)
         {
-            var document = XDocument.Load("RESP.xml");
-            double[] Xarray = document.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
-            double[] Yarray = document.Descendants("Y").Select(g => (double)g).ToArray();
-
             // get a reference to the GraphPane
             GraphPane myPane = zgc.GraphPane;
 
@@ -186,10 +166,6 @@ namespace ProjektISS
         }
         private void CreateGraphST(ZedGraphControl zgc)
         {
-            var document = XDocument.Load("ST.xml");
-            double[] Xarray = document.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
-            double[] Yarray = document.Descendants("Y").Select(g => (double)g).ToArray();
-
             // get a reference to the GraphPane
             GraphPane myPane = zgc.GraphPane;
 
@@ -209,209 +185,235 @@ namespace ProjektISS
         }
         private void LoadData()
         {
-
+            double[] Xarray, Yarray;
             #region HR
-            var documentHR = XDocument.Load("HR.xml");
-            double[] Xarray = documentHR.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
-            double[] Yarray = documentHR.Descendants("Y").Select(g => (double)g).ToArray();
+            try {
+                var documentHR = XDocument.Load("HR.xml");
+                Xarray = documentHR.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
+                Yarray = documentHR.Descendants("Y").Select(g => (double)g).ToArray();
 
-            for (int i = 0; i < Xarray.Count(); i++)
-            {
-                this.dataHR.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                for (int i = 0; i < Xarray.Count(); i++)
+                {
+                    this.dataHR.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                }
             }
+            catch { }
             #endregion
             #region BR
-            var documentBR = XDocument.Load("BR.xml");
-            Xarray = documentBR.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
-            Yarray = documentBR.Descendants("Y").Select(g => (double)g).ToArray();
+            try {
+                var documentBR = XDocument.Load("BR.xml");
+                Xarray = documentBR.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
+                Yarray = documentBR.Descendants("Y").Select(g => (double)g).ToArray();
 
-            for (int i = 0; i < Xarray.Count(); i++)
-            {
-                this.dataBR.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                for (int i = 0; i < Xarray.Count(); i++)
+                {
+                    this.dataBR.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                }
             }
-#endregion
+            catch { }
+            #endregion
             #region ECG
-            var documentECG = XDocument.Load("ECG.xml");
-            Xarray = documentECG.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
-            Yarray = documentECG.Descendants("Y").Select(g => (double)g).ToArray();
+            try {
+                var documentECG = XDocument.Load("ECG.xml");
+                Xarray = documentECG.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
+                Yarray = documentECG.Descendants("Y").Select(g => (double)g).ToArray();
 
-            for (int i = 0; i < Xarray.Count(); i++)
-            {
-                this.dataEKG.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                for (int i = 0; i < Xarray.Count(); i++)
+                {
+                    this.dataEKG.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                }
             }
-#endregion
+            catch { }
+            #endregion
 
             #region EMG
-            var documentEMG = XDocument.Load("EMG.xml");
-            Xarray = documentEMG.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
-            Yarray = documentEMG.Descendants("Y").Select(g => (double)g).ToArray();
+            try {
+                var documentEMG = XDocument.Load("EMG.xml");
+                Xarray = documentEMG.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
+                Yarray = documentEMG.Descendants("Y").Select(g => (double)g).ToArray();
 
-            for (int i = 3; i < Xarray.Count(); i++)
-            {
-                this.dataEMG.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                for (int i = 3; i < Xarray.Count(); i++)
+                {
+                    this.dataEMG.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                }
             }
-#endregion
+            catch { }
+            #endregion
             #region RESP
-            var documentRESP = XDocument.Load("RESP.xml");
-            Xarray = documentRESP.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
-            Yarray = documentRESP.Descendants("Y").Select(g => (double)g).ToArray();
+            try {
+                var documentRESP = XDocument.Load("RESP.xml");
+                Xarray = documentRESP.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
+                Yarray = documentRESP.Descendants("Y").Select(g => (double)g).ToArray();
 
-            for (int i = 3; i < Xarray.Count(); i++)
-            {
-                this.dataRESP.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                for (int i = 3; i < Xarray.Count(); i++)
+                {
+                    this.dataRESP.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                }
             }
-#endregion
+            catch { }
+            #endregion
             #region ST
-            var documentST = XDocument.Load("ST.xml");
-            Xarray = documentST.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
-            Yarray = documentST.Descendants("Y").Select(g => (double)g).ToArray();
+            try {
+                var documentST = XDocument.Load("ST.xml");
+                Xarray = documentST.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
+                Yarray = documentST.Descendants("Y").Select(g => (double)g).ToArray();
 
-            for (int i = 3; i < Xarray.Count(); i++)
-            {
-                this.dataST.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                for (int i = 3; i < Xarray.Count(); i++)
+                {
+                    this.dataST.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                }
             }
-#endregion
+            catch { }
+            #endregion
             #region GSR
-            var documentGSR = XDocument.Load("GSR.xml");
-            Xarray = documentGSR.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
-            Yarray = documentGSR.Descendants("Y").Select(g => (double)g).ToArray();
+            try {
+                var documentGSR = XDocument.Load("GSR.xml");
+                Xarray = documentGSR.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
+                Yarray = documentGSR.Descendants("Y").Select(g => (double)g).ToArray();
 
-            for (int i = 3; i < Xarray.Count(); i++)
-            {
-                this.dataGSR.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                for (int i = 3; i < Xarray.Count(); i++)
+                {
+                    this.dataGSR.Add(new DataPoint() { X = Xarray[i], Y = Yarray[i] });
+                }
             }
+            catch { }
             #endregion
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void buttonSimStart_Click(object sender, EventArgs e)
         {
-            if (this.timerStarted == false)
+            if (this.stopwatch.IsRunning == false && this.stopped==false)
             {
-                Timer timerLong = new Timer();
-                timerLong.Interval = 125;
-                timerLong.Tick += new EventHandler(TimerEventProcessor1);
-
-                Timer clock = new Timer();
-                clock.Interval = 1000;
-                clock.Tick += new EventHandler(ClockProcessor);
-                /*Timer timerShort = new Timer();
-                timerShort.Interval = 4;
-                timerShort.Tick += new EventHandler(TimerEventProcessor2);
-
-                timerShort.Start();*/
+                if (timerLong.Interval == 100)
+                {
+                    timerLong.Interval = 125;
+                    timerLong.Tick += new EventHandler(TimerEventProcessor1);
+                }
                 timerLong.Start();
-                clock.Start();
-
-                this.timerStarted = true;
+                stopwatch.Start();
             }
         }
         private void TimerEventProcessor1(Object myObject,EventArgs myEventArgs)
         {
+            this.label5.Text = String.Format("{0:0.00} s",this.stopwatch.Elapsed.TotalSeconds);
+            if (this.recording && zedGraphControlHR.GraphPane.CurveList.Count<3)
+            {
+                this.label6.Text = String.Format("{0:0.00} s", this.stopwatch.Elapsed.TotalSeconds-this.timeStartRecording);
+            }
             AddPointLong();
             AddPointShort();
         }
-        private void TimerEventProcessor2(Object myObject, EventArgs myEventArgs)
-        {
-            AddPointShort();
-        }
-        private void ClockProcessor(Object myObject, EventArgs myEventArgs)
-        {
-            this.seconds++;
-            label5.Text = this.seconds.ToString() + " s";
-        }
+
 
         private void AddPointShort()
         {
+            int numberOfPoints = 31;
+            if (this.iteration % 4 == 0)
+            {
+                numberOfPoints = 32;
+            }
+
             if (this.dataEKG.Count > 32)
             {
                 LineItem curve = zedGraphControlEKG.GraphPane.CurveList[0] as LineItem;
                 IPointListEdit list = curve.Points as IPointListEdit;
 
-                list.Add(this.dataEKG[0].X, this.dataEKG[0].Y);
+                for (int i = 0; i <= numberOfPoints; i++)
+                {
+                    list.Add(this.dataEKG[0].X, this.dataEKG[0].Y);
+                    this.dataEKG.RemoveAt(0);
+                }
                 zedGraphControlEKG.Invalidate();
 
-                zedGraphControlEKG.ScrollMaxX = list[list.Count - 1].X;
+                double maxX = list[list.Count - 1].X;
+                zedGraphControlEKG.ScrollMaxX = maxX;
 
                 double width = zedGraphControlEKG.GraphPane.XAxis.Scale.Max - zedGraphControlEKG.GraphPane.XAxis.Scale.Min;
-
                 zedGraphControlEKG.GraphPane.XAxis.Scale.Max = list[list.Count - 1].X;
-                zedGraphControlEKG.GraphPane.XAxis.Scale.Min = zedGraphControlEKG.GraphPane.XAxis.Scale.Max - width;
+                zedGraphControlEKG.GraphPane.XAxis.Scale.Min = list[list.Count - 1].X - width;
                 zedGraphControlEKG.AxisChange();
-
-                this.dataEKG.RemoveAt(0);
             }
-            if (this.dataGSR.Count > 0)
-            {
-                LineItem curve = zedGraphControlGSR.GraphPane.CurveList[0] as LineItem;
-                IPointListEdit list = curve.Points as IPointListEdit;
-
-                list.Add(this.dataGSR[0].X, this.dataGSR[0].Y);
-                zedGraphControlGSR.Invalidate();
-
-                zedGraphControlGSR.ScrollMaxX = list[list.Count - 1].X;
-
-                double width = zedGraphControlGSR.GraphPane.XAxis.Scale.Max - zedGraphControlGSR.GraphPane.XAxis.Scale.Min;
-                zedGraphControlGSR.GraphPane.XAxis.Scale.Max = list[list.Count - 1].X;
-                zedGraphControlGSR.GraphPane.XAxis.Scale.Min = zedGraphControlGSR.GraphPane.XAxis.Scale.Max - width;
-                zedGraphControlGSR.AxisChange();
-
-                this.dataGSR.RemoveAt(0);
-            }
-            if (this.dataEMG.Count > 0)
+            if (this.dataEMG.Count > 32)
             {
                 LineItem curve = zedGraphControlEMG.GraphPane.CurveList[0] as LineItem;
                 IPointListEdit list = curve.Points as IPointListEdit;
 
-                list.Add(this.dataEMG[0].X, this.dataEMG[0].Y);
+                for (int i = 0; i <= numberOfPoints; i++)
+                {
+                    list.Add(this.dataEMG[0].X, this.dataEMG[0].Y);
+                    this.dataEMG.RemoveAt(0);
+                }
                 zedGraphControlEMG.Invalidate();
 
-                zedGraphControlEMG.ScrollMaxX = list[list.Count - 1].X;
+                double maxX = list[list.Count - 1].X;
+                zedGraphControlEMG.ScrollMaxX = maxX;
 
                 double width = zedGraphControlEMG.GraphPane.XAxis.Scale.Max - zedGraphControlEMG.GraphPane.XAxis.Scale.Min;
                 zedGraphControlEMG.GraphPane.XAxis.Scale.Max = list[list.Count - 1].X;
-                zedGraphControlEMG.GraphPane.XAxis.Scale.Min = zedGraphControlEMG.GraphPane.XAxis.Scale.Max - width;
+                zedGraphControlEMG.GraphPane.XAxis.Scale.Min = list[list.Count - 1].X - width;
                 zedGraphControlEMG.AxisChange();
-
-                this.dataEMG.RemoveAt(0);
             }
-            if (this.dataRESP.Count > 0)
+            if (this.dataGSR.Count > 32)
             {
-                LineItem curve = zedGraphControlRESP.GraphPane.CurveList[0] as LineItem;
+                LineItem curve = zedGraphControlGSR.GraphPane.CurveList[0] as LineItem;
                 IPointListEdit list = curve.Points as IPointListEdit;
 
-                list.Add(this.dataRESP[0].X, this.dataRESP[0].Y);
-                zedGraphControlRESP.Invalidate();
+                for (int i = 0; i <= numberOfPoints; i++)
+                {
+                    list.Add(this.dataGSR[0].X, this.dataGSR[0].Y);
+                    this.dataGSR.RemoveAt(0);
+                }
+                zedGraphControlGSR.Invalidate();
 
-                zedGraphControlRESP.ScrollMaxX = list[list.Count - 1].X;
+                double maxX = list[list.Count - 1].X;
+                zedGraphControlGSR.ScrollMaxX = maxX;
 
-                double width = zedGraphControlRESP.GraphPane.XAxis.Scale.Max - zedGraphControlRESP.GraphPane.XAxis.Scale.Min;
-                zedGraphControlRESP.GraphPane.XAxis.Scale.Max = list[list.Count - 1].X;
-                zedGraphControlRESP.GraphPane.XAxis.Scale.Min = zedGraphControlRESP.GraphPane.XAxis.Scale.Max - width;
-                zedGraphControlRESP.AxisChange();
-
-                this.dataRESP.RemoveAt(0);
+                double width = zedGraphControlGSR.GraphPane.XAxis.Scale.Max - zedGraphControlGSR.GraphPane.XAxis.Scale.Min;
+                zedGraphControlGSR.GraphPane.XAxis.Scale.Max = list[list.Count - 1].X;
+                zedGraphControlGSR.GraphPane.XAxis.Scale.Min = list[list.Count - 1].X - width;
+                zedGraphControlGSR.AxisChange();
             }
-            if (this.dataST.Count > 0)
+            if (this.dataST.Count > 32)
             {
                 LineItem curve = zedGraphControlST.GraphPane.CurveList[0] as LineItem;
                 IPointListEdit list = curve.Points as IPointListEdit;
 
-                list.Add(this.dataST[0].X, this.dataST[0].Y);
+                for (int i = 0; i <= numberOfPoints; i++)
+                {
+                    list.Add(this.dataST[0].X, this.dataST[0].Y);
+                    this.dataST.RemoveAt(0);
+                }
                 zedGraphControlST.Invalidate();
 
-                zedGraphControlST.ScrollMaxX = list[list.Count - 1].X;
+                double maxX = list[list.Count - 1].X;
+                zedGraphControlST.ScrollMaxX = maxX;
 
                 double width = zedGraphControlST.GraphPane.XAxis.Scale.Max - zedGraphControlST.GraphPane.XAxis.Scale.Min;
                 zedGraphControlST.GraphPane.XAxis.Scale.Max = list[list.Count - 1].X;
-                zedGraphControlST.GraphPane.XAxis.Scale.Min = zedGraphControlST.GraphPane.XAxis.Scale.Max - width;
+                zedGraphControlST.GraphPane.XAxis.Scale.Min = list[list.Count - 1].X - width;
                 zedGraphControlST.AxisChange();
-
-                this.dataST.RemoveAt(0);
             }
-            else
+            if (this.dataRESP.Count > 32)
             {
-                return;
+                LineItem curve = zedGraphControlRESP.GraphPane.CurveList[0] as LineItem;
+                IPointListEdit list = curve.Points as IPointListEdit;
+
+                for (int i = 0; i <= numberOfPoints; i++)
+                {
+                    list.Add(this.dataRESP[0].X, this.dataRESP[0].Y);
+                    this.dataRESP.RemoveAt(0);
+                }
+                zedGraphControlRESP.Invalidate();
+
+                double maxX = list[list.Count - 1].X;
+                zedGraphControlRESP.ScrollMaxX = maxX;
+
+                double width = zedGraphControlRESP.GraphPane.XAxis.Scale.Max - zedGraphControlRESP.GraphPane.XAxis.Scale.Min;
+                zedGraphControlRESP.GraphPane.XAxis.Scale.Max = list[list.Count - 1].X;
+                zedGraphControlRESP.GraphPane.XAxis.Scale.Min = list[list.Count - 1].X - width;
+                zedGraphControlRESP.AxisChange();
             }
+            this.iteration++;
         }
 
         public void AddPointLong()
@@ -429,6 +431,7 @@ namespace ProjektISS
                 double width = zedGraphControlHR.GraphPane.XAxis.Scale.Max - zedGraphControlHR.GraphPane.XAxis.Scale.Min;
                 zedGraphControlHR.GraphPane.XAxis.Scale.Max = list[list.Count - 1].X;
                 zedGraphControlHR.GraphPane.XAxis.Scale.Min = zedGraphControlHR.GraphPane.XAxis.Scale.Max - width;
+
                 zedGraphControlHR.AxisChange();
 
                 label1.Text = Math.Round(this.dataHR[0].Y, 0).ToString();
@@ -462,20 +465,77 @@ namespace ProjektISS
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyValue == ' ')
-            {
-                PointPairList userClickrList = new PointPairList();
+            if (e.KeyValue == ' ' && zedGraphControlHR.GraphPane.CurveList.Count==1 || e.KeyValue == ' ' && zedGraphControlHR.GraphPane.CurveList.Count==2)
+             {
+                GraphPane myPaneHR = zedGraphControlHR.GraphPane;
+                GraphPane myPaneBR = zedGraphControlBR.GraphPane;
+                GraphPane myPaneEKG = zedGraphControlEKG.GraphPane;
+                GraphPane myPaneST = zedGraphControlST.GraphPane;
+                GraphPane myPaneRESP = zedGraphControlRESP.GraphPane;
+                GraphPane myPaneGSR = zedGraphControlGSR.GraphPane;
+                GraphPane myPaneEMG = zedGraphControlEMG.GraphPane;
 
-                GraphPane myPane = zedGraphControlEKG.GraphPane;
+                double time = stopwatch.Elapsed.TotalSeconds;
 
-                LineItem line = new LineItem(String.Empty, new[] { 0.1,  0.1},
-                                new[] { myPane.YAxis.Scale.Min, 0.8*myPane.YAxis.Scale.Max },
+                LineItem line = new LineItem(String.Empty, new[] { time, time },
+                                new[] { (double)-99999, (double)99999 },
                                 Color.Red, SymbolType.None);
                 line.Line.Width = 5;
+                line.IsVisible = false;
 
-                myPane.CurveList.Add(line);
-                zedGraphControlHR.Refresh();
+                myPaneHR.CurveList.Add(line);
+                myPaneBR.CurveList.Add(line);
+                myPaneEKG.CurveList.Add(line);
+                myPaneEMG.CurveList.Add(line);
+                myPaneST.CurveList.Add(line);
+                myPaneRESP.CurveList.Add(line);
+                myPaneGSR.CurveList.Add(line);
+
+                this.recording = !this.recording;
+                this.timeStartRecording = time;
             }
+        }
+
+        private void buttonSimStop_Click(object sender, EventArgs e)
+        {
+            this.stopped = true;
+            timerLong.Stop();
+            stopwatch.Stop();
+
+            GraphPane myPaneHR = zedGraphControlHR.GraphPane;
+            GraphPane myPaneBR = zedGraphControlBR.GraphPane;
+            GraphPane myPaneEKG = zedGraphControlEKG.GraphPane;
+            GraphPane myPaneST = zedGraphControlST.GraphPane;
+            GraphPane myPaneRESP = zedGraphControlRESP.GraphPane;
+            GraphPane myPaneGSR = zedGraphControlGSR.GraphPane;
+            GraphPane myPaneEMG = zedGraphControlEMG.GraphPane;
+
+            if (myPaneHR.CurveList.Count > 1)
+            {
+                myPaneHR.CurveList[1].IsVisible = true;
+                myPaneBR.CurveList[1].IsVisible = true;
+                myPaneEKG.CurveList[1].IsVisible = true;
+                myPaneST.CurveList[1].IsVisible = true;
+                myPaneRESP.CurveList[1].IsVisible = true;
+                myPaneGSR.CurveList[1].IsVisible = true;
+                myPaneEMG.CurveList[1].IsVisible = true;
+            }
+            if (myPaneHR.CurveList.Count == 3)
+            {
+                myPaneHR.CurveList[2].IsVisible = true;
+                myPaneBR.CurveList[2].IsVisible = true;
+                myPaneEKG.CurveList[2].IsVisible = true;
+                myPaneST.CurveList[2].IsVisible = true;
+                myPaneRESP.CurveList[2].IsVisible = true;
+                myPaneGSR.CurveList[2].IsVisible = true;
+                myPaneEMG.CurveList[2].IsVisible = true;
+            }
+
+            zedGraphControlEKG.Invalidate();
+            zedGraphControlST.Invalidate();
+            zedGraphControlRESP.Invalidate();
+            zedGraphControlGSR.Invalidate();
+            zedGraphControlEMG.Invalidate();
         }
     }
 }

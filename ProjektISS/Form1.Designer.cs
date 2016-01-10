@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.zedGraphControlHR = new ZedGraph.ZedGraphControl();
-            this.button1 = new System.Windows.Forms.Button();
+            this.buttonSimStart = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label1unit = new System.Windows.Forms.Label();
@@ -52,6 +52,7 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
+            this.buttonSimStop = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -61,7 +62,6 @@
             this.zedGraphControlHR.AutoScroll = true;
             this.zedGraphControlHR.BackColor = System.Drawing.SystemColors.Control;
             this.zedGraphControlHR.IsAntiAlias = true;
-            this.zedGraphControlHR.IsEnableVPan = false;
             this.zedGraphControlHR.IsShowHScrollBar = true;
             this.zedGraphControlHR.IsShowPointValues = true;
             this.zedGraphControlHR.IsSynchronizeXAxes = true;
@@ -79,15 +79,15 @@
             this.zedGraphControlHR.TabIndex = 0;
             this.zedGraphControlHR.UseExtendedPrintDialog = true;
             // 
-            // button1
+            // buttonSimStart
             // 
-            this.button1.Location = new System.Drawing.Point(27, 30);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(161, 33);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "Simulation Start";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.buttonSimStart.Location = new System.Drawing.Point(27, 30);
+            this.buttonSimStart.Name = "buttonSimStart";
+            this.buttonSimStart.Size = new System.Drawing.Size(161, 33);
+            this.buttonSimStart.TabIndex = 1;
+            this.buttonSimStart.Text = "Simulation Start";
+            this.buttonSimStart.UseVisualStyleBackColor = true;
+            this.buttonSimStart.Click += new System.EventHandler(this.buttonSimStart_Click);
             // 
             // label1
             // 
@@ -147,7 +147,6 @@
             this.zedGraphControlBR.AutoScroll = true;
             this.zedGraphControlBR.BackColor = System.Drawing.SystemColors.Control;
             this.zedGraphControlBR.IsAntiAlias = true;
-            this.zedGraphControlBR.IsEnableVPan = false;
             this.zedGraphControlBR.IsShowHScrollBar = true;
             this.zedGraphControlBR.IsShowPointValues = true;
             this.zedGraphControlBR.IsSynchronizeXAxes = true;
@@ -181,7 +180,6 @@
             this.zedGraphControlEKG.AutoScroll = true;
             this.zedGraphControlEKG.BackColor = System.Drawing.SystemColors.Control;
             this.zedGraphControlEKG.IsAntiAlias = true;
-            this.zedGraphControlEKG.IsEnableVPan = false;
             this.zedGraphControlEKG.IsShowHScrollBar = true;
             this.zedGraphControlEKG.IsShowPointValues = true;
             this.zedGraphControlEKG.IsSynchronizeXAxes = true;
@@ -213,7 +211,6 @@
             this.zedGraphControlGSR.AutoScroll = true;
             this.zedGraphControlGSR.BackColor = System.Drawing.SystemColors.Control;
             this.zedGraphControlGSR.IsAntiAlias = true;
-            this.zedGraphControlGSR.IsEnableVPan = false;
             this.zedGraphControlGSR.IsShowHScrollBar = true;
             this.zedGraphControlGSR.IsShowPointValues = true;
             this.zedGraphControlGSR.IsSynchronizeXAxes = true;
@@ -245,7 +242,6 @@
             this.zedGraphControlEMG.AutoScroll = true;
             this.zedGraphControlEMG.BackColor = System.Drawing.SystemColors.Control;
             this.zedGraphControlEMG.IsAntiAlias = true;
-            this.zedGraphControlEMG.IsEnableVPan = false;
             this.zedGraphControlEMG.IsShowHScrollBar = true;
             this.zedGraphControlEMG.IsShowPointValues = true;
             this.zedGraphControlEMG.IsSynchronizeXAxes = true;
@@ -277,7 +273,6 @@
             this.zedGraphControlRESP.AutoScroll = true;
             this.zedGraphControlRESP.BackColor = System.Drawing.SystemColors.Control;
             this.zedGraphControlRESP.IsAntiAlias = true;
-            this.zedGraphControlRESP.IsEnableVPan = false;
             this.zedGraphControlRESP.IsShowHScrollBar = true;
             this.zedGraphControlRESP.IsShowPointValues = true;
             this.zedGraphControlRESP.IsSynchronizeXAxes = true;
@@ -309,7 +304,6 @@
             this.zedGraphControlST.AutoScroll = true;
             this.zedGraphControlST.BackColor = System.Drawing.SystemColors.Control;
             this.zedGraphControlST.IsAntiAlias = true;
-            this.zedGraphControlST.IsEnableVPan = false;
             this.zedGraphControlST.IsShowHScrollBar = true;
             this.zedGraphControlST.IsShowPointValues = true;
             this.zedGraphControlST.IsSynchronizeXAxes = true;
@@ -339,7 +333,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(24, 87);
+            this.label4.Location = new System.Drawing.Point(32, 134);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(107, 17);
             this.label4.TabIndex = 16;
@@ -348,7 +342,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(144, 87);
+            this.label5.Location = new System.Drawing.Point(152, 134);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(27, 17);
             this.label5.TabIndex = 17;
@@ -357,7 +351,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(144, 115);
+            this.label6.Location = new System.Drawing.Point(152, 162);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(27, 17);
             this.label6.TabIndex = 19;
@@ -366,17 +360,29 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(25, 115);
+            this.label7.Location = new System.Drawing.Point(33, 162);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(107, 17);
             this.label7.TabIndex = 18;
             this.label7.Text = "Recording time:";
             // 
+            // buttonSimStop
+            // 
+            this.buttonSimStop.Location = new System.Drawing.Point(27, 69);
+            this.buttonSimStop.Name = "buttonSimStop";
+            this.buttonSimStop.Size = new System.Drawing.Size(161, 33);
+            this.buttonSimStop.TabIndex = 20;
+            this.buttonSimStop.Text = "Simulation Stop";
+            this.buttonSimStop.UseVisualStyleBackColor = true;
+            this.buttonSimStop.Click += new System.EventHandler(this.buttonSimStop_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1318, 831);
+            this.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.ClientSize = new System.Drawing.Size(1320, 820);
+            this.Controls.Add(this.buttonSimStop);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label5);
@@ -393,11 +399,14 @@
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.zedGraphControlBR);
             this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.buttonSimStart);
             this.Controls.Add(this.zedGraphControlHR);
             this.Controls.Add(this.groupBox1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.KeyPreview = true;
+            this.MaximizeBox = false;
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.groupBox1.ResumeLayout(false);
@@ -412,7 +421,7 @@
         #endregion
 
         private ZedGraph.ZedGraphControl zedGraphControlHR;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button buttonSimStart;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label1unit;
@@ -434,6 +443,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button buttonSimStop;
     }
 }
 
