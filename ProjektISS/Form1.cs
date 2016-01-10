@@ -29,6 +29,7 @@ namespace ProjektISS
         private double timeStartRecording = 0;
         private int iteration = 0;
         private bool stopped = false;
+        private string path;
 
         public Form1()
         {
@@ -38,8 +39,19 @@ namespace ProjektISS
         // Respond to form 'Load' event
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Setup the graph
-            LoadData();
+            bool pathNotSelected = true;
+            do {
+                // Select a path
+                folderBrowserDialog1.Description = "Odaberite mapu s podacima (HR.xml, BR.xml, ECG.xml, EMG.xml, ST.xml, RESP.xml, GSR.xml)";
+                DialogResult result = folderBrowserDialog1.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    this.path = folderBrowserDialog1.SelectedPath+"\\";
+                    pathNotSelected = false;
+                }
+            } while (pathNotSelected);
+                // Setup the graph
+                LoadData(path);
             CreateGraphHR(zedGraphControlHR);
             CreateGraphBR(zedGraphControlBR);
             CreateGraphEKG(zedGraphControlEKG);
@@ -83,7 +95,7 @@ namespace ProjektISS
             PointPairList list1 = new PointPairList();
 
             LineItem myCurve = myPane.AddCurve("BR",
-                  list1, Color.Blue, SymbolType.Triangle);
+                  list1, Color.Green, SymbolType.Triangle);
 
             zedGraphControlBR.ScrollMinX = 0;
             zgc.AxisChange();
@@ -121,7 +133,7 @@ namespace ProjektISS
             PointPairList list1 = new PointPairList();
 
             LineItem myCurve = myPane.AddCurve("EMG",
-                  list1, Color.Violet, SymbolType.None);
+                  list1, Color.Brown, SymbolType.None);
 
             zedGraphControlEMG.ScrollMinX = 0;
             zgc.AxisChange();
@@ -134,13 +146,13 @@ namespace ProjektISS
             // Set the Titles
             myPane.Title.Text = "GSR";
             myPane.XAxis.Title.Text = "seconds";
-            myPane.YAxis.Title.Text = "milivolt";
+            myPane.YAxis.Title.Text = "μS";
             myPane.Legend.IsVisible = false;
 
             PointPairList list1 = new PointPairList();
 
             LineItem myCurve = myPane.AddCurve("GSR",
-                  list1, Color.Violet, SymbolType.None);
+                  list1, Color.Black, SymbolType.None);
 
             zedGraphControlGSR.ScrollMinX = 0;
             zgc.AxisChange();
@@ -178,17 +190,17 @@ namespace ProjektISS
             PointPairList list1 = new PointPairList();
 
             LineItem myCurve = myPane.AddCurve("ST",
-                  list1, Color.Violet, SymbolType.None);
+                  list1, Color.Purple, SymbolType.None);
 
             zedGraphControlST.ScrollMinX = 0;
             zgc.AxisChange();
         }
-        private void LoadData()
+        private void LoadData(string path)
         {
             double[] Xarray, Yarray;
             #region HR
             try {
-                var documentHR = XDocument.Load("HR.xml");
+                var documentHR = XDocument.Load(path+"HR.xml");
                 Xarray = documentHR.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
                 Yarray = documentHR.Descendants("Y").Select(g => (double)g).ToArray();
 
@@ -201,7 +213,7 @@ namespace ProjektISS
             #endregion
             #region BR
             try {
-                var documentBR = XDocument.Load("BR.xml");
+                var documentBR = XDocument.Load(path+"BR.xml");
                 Xarray = documentBR.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
                 Yarray = documentBR.Descendants("Y").Select(g => (double)g).ToArray();
 
@@ -214,7 +226,7 @@ namespace ProjektISS
             #endregion
             #region ECG
             try {
-                var documentECG = XDocument.Load("ECG.xml");
+                var documentECG = XDocument.Load(path+"ECG.xml");
                 Xarray = documentECG.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
                 Yarray = documentECG.Descendants("Y").Select(g => (double)g).ToArray();
 
@@ -228,7 +240,7 @@ namespace ProjektISS
 
             #region EMG
             try {
-                var documentEMG = XDocument.Load("EMG.xml");
+                var documentEMG = XDocument.Load(path+"EMG.xml");
                 Xarray = documentEMG.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
                 Yarray = documentEMG.Descendants("Y").Select(g => (double)g).ToArray();
 
@@ -241,7 +253,7 @@ namespace ProjektISS
             #endregion
             #region RESP
             try {
-                var documentRESP = XDocument.Load("RESP.xml");
+                var documentRESP = XDocument.Load(path+"RESP.xml");
                 Xarray = documentRESP.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
                 Yarray = documentRESP.Descendants("Y").Select(g => (double)g).ToArray();
 
@@ -254,7 +266,7 @@ namespace ProjektISS
             #endregion
             #region ST
             try {
-                var documentST = XDocument.Load("ST.xml");
+                var documentST = XDocument.Load(path+"ST.xml");
                 Xarray = documentST.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
                 Yarray = documentST.Descendants("Y").Select(g => (double)g).ToArray();
 
@@ -267,7 +279,7 @@ namespace ProjektISS
             #endregion
             #region GSR
             try {
-                var documentGSR = XDocument.Load("GSR.xml");
+                var documentGSR = XDocument.Load(path+"GSR.xml");
                 Xarray = documentGSR.Descendants("X").Select(g => Math.Round((double)g, 3)).ToArray();
                 Yarray = documentGSR.Descendants("Y").Select(g => (double)g).ToArray();
 
