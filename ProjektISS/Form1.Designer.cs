@@ -175,7 +175,7 @@
             this.groupBox2.Size = new System.Drawing.Size(661, 253);
             this.groupBox2.TabIndex = 5;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Basal Rate";
+            this.groupBox2.Text = "Breathing Rate";
             // 
             // zedGraphControlEKG
             // 
